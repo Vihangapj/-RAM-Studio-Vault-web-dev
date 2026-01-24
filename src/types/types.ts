@@ -18,6 +18,7 @@ export interface Content {
     category: string;
     type: ContentType;
     thumbnailUrl: string;
+    thumbnails?: string[]; // Multiple thumbnails support
     youtubeId: string; // Trailer or Main Video
     resources: Resource[];
     lessons?: Lesson[]; // Only for 'course'

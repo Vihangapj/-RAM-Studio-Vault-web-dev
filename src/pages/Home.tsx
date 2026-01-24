@@ -51,7 +51,7 @@ const Home: React.FC = () => {
         return (
             <Layout>
                 <Hero featuredContent={null} />
-                <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-8 md:space-y-12">
+                <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-2 md:space-y-4">
                     <ContentRow title="Trending in Vault" contents={[]} loading={true} />
                     <ContentRow title="Development" contents={[]} loading={true} />
                     <ContentRow title="Design" contents={[]} loading={true} />
@@ -65,7 +65,7 @@ const Home: React.FC = () => {
         <Layout>
             <Hero featuredContent={featured} />
 
-            <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-8 md:space-y-12">
+            <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-2 md:space-y-4">
                 {contents.length > 0 ? (
                     <>
                         <ContentRow title="Trending in Vault" contents={contents.slice(0, 10)} />

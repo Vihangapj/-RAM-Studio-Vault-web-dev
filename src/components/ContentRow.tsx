@@ -25,8 +25,8 @@ const ContentRow: React.FC<ContentRowProps> = ({ title, contents, loading = fals
     }
 
     return (
-        <div className="py-4 md:py-6 relative group/row">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-4 tracking-tight hover:text-zinc-200 transition-colors cursor-pointer inline-block px-4 md:px-8">
+        <div className="py-2 relative group/row">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight hover:text-zinc-200 transition-colors cursor-pointer inline-block px-4 md:px-8">
                 {title}
             </h2>
 

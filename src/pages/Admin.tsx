@@ -7,7 +7,10 @@ import { Plus, Trash2, Save, Loader2, Eye, Tag, X, Pencil, Filter, ChevronDown, 
 import type { Content } from '../types/types';
 
 // Extend Content type for Form (omit id, timestamps)
-type ContentFormData = Omit<Content, 'id' | 'createdAt'>;
+// Extend Content type for Form (omit id, timestamps)
+type ContentFormData = Omit<Content, 'id' | 'createdAt' | 'thumbnails'> & {
+    thumbnails: { url: string }[];
+};
 
 // Component for managing resources per lesson
 interface LessonResourcesProps {
@@ -86,6 +89,7 @@ const Admin: React.FC = () => {
         defaultValues: {
             type: 'course',
             resources: [],
+            thumbnails: [],
             lessons: []
         }
     });
@@ -161,15 +165,22 @@ const Admin: React.FC = () => {
         name: "lessons"
     });
 
+    const { fields: thumbnailFields, append: appendThumbnail, remove: removeThumbnail } = useFieldArray({
+        control,
+        name: "thumbnails"
+    });
+
     const onSubmit: SubmitHandler<ContentFormData> = async (data) => {
         setIsSubmitting(true);
         setMessage(null);
         try {
             // Clean up data (remove lessons if video type)
-            const cleanData = { ...data };
+            const cleanData: any = { ...data };
             if (cleanData.type === 'video') {
                 delete cleanData.lessons;
             }
+            // Map thumbnails back to string[]
+            cleanData.thumbnails = data.thumbnails?.map((t: any) => t.url) || [];
 
             if (editingId) {
                 // Update existing document
@@ -194,9 +205,9 @@ const Admin: React.FC = () => {
                 description: '',
                 category: '',
                 type: 'course',
-                thumbnailUrl: '',
                 youtubeId: '',
                 resources: [],
+                thumbnails: [],
                 lessons: []
             });
         } catch (error: any) {
@@ -217,6 +228,7 @@ const Admin: React.FC = () => {
             thumbnailUrl: content.thumbnailUrl,
             youtubeId: content.youtubeId,
             resources: content.resources || [],
+            thumbnails: content.thumbnails?.map(t => ({ url: t })) || [],
             lessons: content.lessons || []
         });
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -243,6 +255,7 @@ const Admin: React.FC = () => {
             thumbnailUrl: '',
             youtubeId: '',
             resources: [],
+            thumbnails: [],
             lessons: []
         });
     };
@@ -423,6 +436,34 @@ const Admin: React.FC = () => {
                                     <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1 rounded">Preview</span>
                                 </div>
                             )}
+
+                            {/* Additional Thumbnails */}
+                            <div className="space-y-2 mt-4">
+                                <label className="text-sm font-medium text-zinc-300 flex items-center justify-between">
+                                    Additional Thumbnails
+                                    <button
+                                        type="button"
+                                        onClick={() => appendThumbnail({ url: '' })}
+                                        className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                                    >
+                                        <Plus className="w-3 h-3" /> Add
+                                    </button>
+                                </label>
+                                <div className="space-y-2">
+                                    {thumbnailFields.map((field, index) => (
+                                        <div key={field.id} className="flex gap-2">
+                                            <input
+                                                {...register(`thumbnails.${index}.url` as const)}
+                                                placeholder={`Thumbnail URL ${index + 1}`}
+                                                className="flex-1 bg-zinc-800 border border-zinc-700 rounded p-2 text-sm focus:outline-none focus:border-white"
+                                            />
+                                            <button type="button" onClick={() => removeThumbnail(index)} className="text-zinc-500 hover:text-red-400">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="space-y-2 md:col-span-2">

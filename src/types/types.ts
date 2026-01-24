@@ -9,6 +9,7 @@ export interface Lesson {
     title: string;
     youtubeId: string;
     resources?: Resource[];
+    durationSeconds?: number; // optional: duration in seconds (if available)
 }
 
 export interface Content {

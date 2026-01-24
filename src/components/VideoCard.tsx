@@ -2,24 +2,61 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { Content } from '../types/types';
 import { Play } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface VideoCardProps {
     content: Content;
+    onClick?: (content: Content) => void;
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ content }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
+    const navigate = useNavigate();
     const [imageError, setImageError] = React.useState(false);
+    const [currentThumbIndex, setCurrentThumbIndex] = React.useState(0);
+    const [isHovered, setIsHovered] = React.useState(false);
+    const intervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    React.useEffect(() => {
+        if (isHovered && content.thumbnails && content.thumbnails.length > 0) {
+            intervalRef.current = setInterval(() => {
+                setCurrentThumbIndex(prev => {
+                    const totalImages = (content.thumbnails?.length || 0) + 1;
+                    return (prev + 1) % totalImages;
+                });
+            }, 1000); // Fast cycle on hover
+        } else {
+            setCurrentThumbIndex(0);
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        }
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, [isHovered, content.thumbnails]);
+
+    const displayThumb = React.useMemo(() => {
+        const allImages = [content.thumbnailUrl, ...(content.thumbnails || [])];
+        return allImages[currentThumbIndex] || content.thumbnailUrl;
+    }, [content.thumbnailUrl, content.thumbnails, currentThumbIndex]);
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick(content);
+        } else {
+            navigate(`/watch/${content.id}`);
+        }
+    };
 
     return (
-        <Link
-            to={`/watch/${content.id}`}
-            className="block flex-shrink-0"
+        <div
+            className="block flex-shrink-0 cursor-pointer"
             style={{ width: '280px', minWidth: '280px' }}
+            onClick={handleClick}
         >
             <motion.div
                 className="relative w-full rounded-lg overflow-hidden bg-zinc-800 cursor-pointer group"
                 style={{ aspectRatio: '16/9' }}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
                 whileHover={{
                     scale: 1.05,
                     zIndex: 20,
@@ -29,11 +66,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ content }) => {
                 {/* Thumbnail Image */}
                 {content.thumbnailUrl && !imageError ? (
                     <img
-                        src={content.thumbnailUrl}
+                        src={displayThumb}
                         alt={content.title}
                         loading="lazy"
                         onError={() => setImageError(true)}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                     />
                 ) : (
                     <div className="absolute inset-0 w-full h-full bg-zinc-800 flex items-center justify-center">
@@ -69,7 +106,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ content }) => {
                     </div>
                 </div>
             </motion.div>
-        </Link>
+        </div>
     );
 };
 

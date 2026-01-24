@@ -9,6 +9,17 @@ interface CoursePlaylistProps {
 }
 
 const CoursePlaylist: React.FC<CoursePlaylistProps> = ({ lessons, currentIndex, onSelect }) => {
+    const formatDuration = (seconds?: number) => {
+        if (seconds === undefined) return '—';
+        if (seconds >= 3600) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            return `${h}h ${m}m`;
+        }
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
     return (
         <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
@@ -33,7 +44,7 @@ const CoursePlaylist: React.FC<CoursePlaylistProps> = ({ lessons, currentIndex, 
                             </div>
                             <div>
                                 <h4 className="text-sm font-medium line-clamp-1">{lesson.title}</h4>
-                                <div className="text-xs text-zinc-500 mt-1">10:00</div>
+                                <div className="text-xs text-zinc-500 mt-1">{lesson.durationSeconds ? formatDuration(lesson.durationSeconds) : '—'}</div>
                             </div>
                         </button>
                     );

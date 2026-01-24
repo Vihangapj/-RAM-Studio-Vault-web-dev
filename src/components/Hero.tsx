@@ -9,6 +9,24 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
     const [showTrailer, setShowTrailer] = React.useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+
+    // Cycle through thumbnails if available
+    React.useEffect(() => {
+        if (featuredContent?.thumbnails && featuredContent.thumbnails.length > 0) {
+            const timer = setInterval(() => {
+                setCurrentImageIndex((prev) => (prev + 1) % (featuredContent.thumbnails!.length + 1));
+            }, 3000); // Change every 3 seconds
+            return () => clearInterval(timer);
+        }
+    }, [featuredContent]);
+
+    // Combine main thumbnail with additional thumbnails
+    const displayImage = React.useMemo(() => {
+        if (!featuredContent) return '';
+        const allImages = [featuredContent.thumbnailUrl, ...(featuredContent.thumbnails || [])];
+        return allImages[currentImageIndex] || featuredContent.thumbnailUrl;
+    }, [featuredContent, currentImageIndex]);
 
     if (!featuredContent) {
         return (
@@ -19,11 +37,14 @@ const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
     return (
         <div className="relative w-full h-[60vh] md:h-[80vh]">
             {/* Background Image/Video */}
-            <img
-                src={featuredContent.thumbnailUrl}
-                alt={featuredContent.title}
-                className="w-full h-full object-cover"
-            />
+            <div className="absolute inset-0 bg-black">
+                <img
+                    key={displayImage} // Force re-render for animation if needed, or rely on src change
+                    src={displayImage}
+                    alt={featuredContent.title}
+                    className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                />
+            </div>
 
             {/* Overlay Gradient (Bottom up and Left to right for text) */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />

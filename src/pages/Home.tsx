@@ -41,7 +41,6 @@ const Home: React.FC = () => {
 
     const featured = contents.find(c => c.featured) || contents[0];
 
-    const courses = contents.filter(c => c.type === 'course');
     const assets = contents.filter(c => c.category === 'Assets');
 
 
@@ -55,7 +54,6 @@ const Home: React.FC = () => {
                     <ContentRow title="Trending in Vault" contents={[]} loading={true} />
                     <ContentRow title="Development" contents={[]} loading={true} />
                     <ContentRow title="Design" contents={[]} loading={true} />
-                    <ContentRow title="Full Courses" contents={[]} loading={true} />
                 </div>
             </Layout>
         );
@@ -76,7 +74,7 @@ const Home: React.FC = () => {
                             if (catContents.length === 0) return null;
                             return <ContentRow key={cat} title={cat} contents={catContents} />;
                         })}
-                        {courses.length > 0 && <ContentRow title="Full Courses" contents={courses} />}
+                        
                         {assets.length > 0 && <ContentRow title="Vault Assets" contents={assets} />}
                     </>
                 ) : (

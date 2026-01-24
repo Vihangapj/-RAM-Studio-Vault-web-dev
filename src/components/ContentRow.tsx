@@ -30,9 +30,9 @@ const ContentRow: React.FC<ContentRowProps> = ({ title, contents, loading = fals
                 {title}
             </h2>
 
-            <div className="group relative overflow-visible">
+            <div className="relative overflow-visible">
                 <ChevronLeft
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-10 h-20 bg-black/50 hover:bg-black/70 text-white cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-10 h-20 bg-black/50 hover:bg-black/70 text-white cursor-pointer opacity-0 group-row-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center"
                     onClick={() => slide(-400)}
                 />
 
@@ -51,7 +51,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ title, contents, loading = fals
                 </div>
 
                 <ChevronRight
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-10 h-20 bg-black/50 hover:bg-black/70 text-white cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-10 h-20 bg-black/50 hover:bg-black/70 text-white cursor-pointer opacity-0 group-row-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center"
                     onClick={() => slide(400)}
                 />
             </div>

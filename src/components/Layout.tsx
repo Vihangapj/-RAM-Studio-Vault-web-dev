@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </main>
             {/* Footer can go here */}
             <footer className="py-10 text-center text-zinc-600 text-sm border-t border-zinc-900 mt-20">
-                <p>© {new Date().getFullYear()} RAM Studio Vault. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} RAM Studios Vault. All rights reserved.</p>
             </footer>
         </div>
     );

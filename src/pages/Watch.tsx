@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { db } from '../utils/firebase';
 import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import type { Content } from '../types/types';
 import ResourceList from '../components/ResourceList';
 import CoursePlaylist from '../components/CoursePlaylist';
-import { ChevronLeft } from 'lucide-react';
 
 const Watch: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -57,18 +56,14 @@ const Watch: React.FC = () => {
         : content.title;
 
     return (
-        <Layout>
-            <div className="pt-24 px-4 md:px-8 max-w-[1800px] mx-auto min-h-screen">
-                <Link to="/" className="inline-flex items-center text-zinc-400 hover:text-white mb-6 transition-colors">
-                    <ChevronLeft className="w-4 h-4 mr-1" />
-                    Back to Vault
-                </Link>
+        <Layout hideFooter={true}>
+            <div className="pt-24 px-4 min-h-screen">
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Player Column */}
-                    <div className="lg:col-span-2 space-y-6">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Main Player Column - Sticky on large screens */}
+                    <div className="lg:w-3/5 lg:sticky lg:top-24 lg:self-start space-y-6">
                         {/* 16:9 Player Container */}
-                        <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                        <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 max-h-[28rem]">
                             <iframe
                                 src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=0&modestbranding=1&rel=0`}
                                 title={currentTitle}
@@ -92,7 +87,7 @@ const Watch: React.FC = () => {
                     </div>
 
                     {/* Sidebar Column */}
-                    <div className="space-y-6">
+                    <div className="lg:w-2/5 space-y-6">
                         {/* Course Playlist */}
                         {content.type === 'course' && content.lessons && (
                             <CoursePlaylist

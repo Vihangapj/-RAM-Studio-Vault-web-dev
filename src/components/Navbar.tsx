@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
         <>
             <nav
                 className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-                    ? 'bg-black/90 backdrop-blur-md border-b border-white/10'
+                    ? 'bg-black/90 backdrop-blur-md'
                     : 'bg-gradient-to-b from-black/90 to-transparent'
                     }`}
             >
@@ -62,10 +62,10 @@ const Navbar: React.FC = () => {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-300">
-                            <Link to="/courses" className="hover:text-white transition-colors">Courses</Link>
+                        <div className="hidden md:flex items-center gap-6 text-sm font-gunterz-bold-italic text-zinc-300">
+                            <Link to="/courses" className="hover:text-white hover:bg-white/10 px-3 py-2 rounded transition-all">Courses</Link>
                             {isAdmin && (
-                                <Link to="/admin" className="text-red-500 hover:text-red-400 transition-colors">
+                                <Link to="/admin" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-3 py-2 rounded transition-all">
                                     Admin
                                 </Link>
                             )}
@@ -88,7 +88,10 @@ const Navbar: React.FC = () => {
 
                         {/* Mobile Search Icon */}
                         <button
-                            onClick={() => setIsMobileMenuOpen(true)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMobileMenuOpen(true);
+                            }}
                             className="md:hidden p-2 text-zinc-400 hover:text-white transition-colors"
                             aria-label="Search"
                         >
@@ -97,7 +100,10 @@ const Navbar: React.FC = () => {
 
                         {/* Mobile Menu Toggle */}
                         <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMobileMenuOpen(!isMobileMenuOpen);
+                            }}
                             className="menu-toggle md:hidden p-2 text-zinc-400 hover:text-white transition-colors"
                             aria-label="Toggle Menu"
                         >
@@ -157,7 +163,7 @@ const Navbar: React.FC = () => {
                             className="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-300 hover:text-white hover:bg-white/5 transition-all"
                         >
                             <BookOpen className="w-5 h-5" />
-                            <span className="font-medium">Courses</span>
+                            <span className="font-gunterz-bold-italic">Courses</span>
                         </Link>
                         {isAdmin && (
                             <Link
@@ -166,7 +172,7 @@ const Navbar: React.FC = () => {
                                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
                             >
                                 <Shield className="w-5 h-5" />
-                                <span className="font-medium">Admin Panel</span>
+                                <span className="font-gunterz-bold-italic">Admin Panel</span>
                             </Link>
                         )}
                     </div>

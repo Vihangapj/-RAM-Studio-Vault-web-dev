@@ -15,6 +15,10 @@ export default {
       aspectRatio: {
         'video': '16 / 9',
       },
+      fontFamily: {
+        'gunterz-black': ['Gunterz-Black', 'sans-serif'],
+        'gunterz-bold-italic': ['Gunterz-BoldItalic', 'sans-serif'],
+      },
     },
   },
   plugins: [],

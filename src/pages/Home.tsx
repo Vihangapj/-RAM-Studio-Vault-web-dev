@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Hero from '../components/Hero';
 import ContentRow from '../components/ContentRow';
+import Loading from '../components/Loading';
+import CourseDetailsModal from '../components/CourseDetailsModal';
 import { db } from '../utils/firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import type { Content } from '../types/types';
@@ -10,6 +13,18 @@ const Home: React.FC = () => {
     const [contents, setContents] = React.useState<Content[]>([]);
     const [categories, setCategories] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [selectedCourse, setSelectedCourse] = React.useState<Content | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
+    const navigate = useNavigate();
+
+    const handleContentClick = (content: Content) => {
+        if (content.type === 'course') {
+            setSelectedCourse(content);
+            setShowModal(true);
+        } else {
+            navigate(`/watch/${content.id}`);
+        }
+    };
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -47,40 +62,43 @@ const Home: React.FC = () => {
     // Skeleton Rows for "Netflix-like" loading
     // Skeleton Rows for "Netflix-like" loading
     if (loading) {
-        return (
-            <Layout>
-                <Hero featuredContent={null} />
-                <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-2 md:space-y-4">
-                    <ContentRow title="Trending in Vault" contents={[]} loading={true} />
-                    <ContentRow title="Development" contents={[]} loading={true} />
-                    <ContentRow title="Design" contents={[]} loading={true} />
-                </div>
-            </Layout>
-        );
+        return <Loading />;
     }
 
     return (
         <Layout>
             <Hero featuredContent={featured} />
 
-            <div className="pb-20 -mt-20 relative z-20 md:-mt-32 space-y-2 md:space-y-4">
+            <div className="pb-20 -mt-20 relative z-20 md:-mt-40 space-y-4 md:space-y-8">
                 {contents.length > 0 ? (
                     <>
-                        <ContentRow title="Trending in Vault" contents={contents.slice(0, 10)} />
+                        <ContentRow title="Trending in Vault" contents={contents.slice(0, 10)} onClick={handleContentClick} />
 
                         {/* Dynamic Categories */}
                         {categories.map(cat => {
                             const catContents = contents.filter(c => c.category === cat);
                             if (catContents.length === 0) return null;
-                            return <ContentRow key={cat} title={cat} contents={catContents} />;
+                            return <ContentRow key={cat} title={cat} contents={catContents} onClick={handleContentClick} />;
                         })}
                         
-                        {assets.length > 0 && <ContentRow title="Vault Assets" contents={assets} />}
+                        {assets.length > 0 && <ContentRow title="Vault Assets" contents={assets} onClick={handleContentClick} />}
                     </>
                 ) : (
                     <div className="text-center text-zinc-500 py-20">No content available. Check back later.</div>
                 )}
             </div>
+
+            {/* Course Details Modal */}
+            {selectedCourse && (
+                <CourseDetailsModal
+                    content={selectedCourse}
+                    isOpen={showModal}
+                    onClose={() => {
+                        setShowModal(false);
+                        setSelectedCourse(null);
+                    }}
+                />
+            )}
         </Layout>
     );
 };

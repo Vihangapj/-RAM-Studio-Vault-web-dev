@@ -51,8 +51,8 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                             className="w-full h-64 object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
-                        <div className="absolute bottom-6 left-6 right-6">
-                            <h1 className="text-3xl font-bold text-white mb-2">{content.title}</h1>
+                        <div className="absolute bottom-4 left-4 right-4">
+                            <h1 className="text-3xl font-gunterz-black text-white mb-2">{content.title}</h1>
                             <div className="flex items-center gap-4 text-zinc-300">
                                 <span className="flex items-center gap-1">
                                     <BookOpen className="w-4 h-4" />
@@ -70,18 +70,18 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 space-y-6">
                         {/* Description */}
                         <div>
-                            <h2 className="text-xl font-semibold text-white mb-3">About this course</h2>
+                            <h2 className="text-xl font-gunterz-black text-white mb-3">About this course</h2>
                             <p className="text-zinc-300 leading-relaxed">{content.description}</p>
                         </div>
 
                         {/* Lessons Preview */}
                         {content.lessons && content.lessons.length > 0 && (
                             <div>
-                                <h2 className="text-xl font-semibold text-white mb-3">Course Syllabus</h2>
-                                <div className="space-y-2 max-h-60 overflow-y-auto">
+                                <h2 className="text-xl font-gunterz-black text-white mb-3">Course Syllabus</h2>
+                                <div className="space-y-2 max-h-96 overflow-y-auto">
                                     {content.lessons.slice(0, 5).map((lesson, idx) => (
                                         <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
                                             <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">

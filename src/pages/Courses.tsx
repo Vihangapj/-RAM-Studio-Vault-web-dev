@@ -33,21 +33,20 @@ const Courses: React.FC = () => {
 
     return (
         <Layout>
-            <div className="pt-24 pb-20 px-4 md:px-8 max-w-[1800px] mx-auto min-h-screen">
-                <h1 className="text-3xl md:text-5xl font-bold mb-8 text-white tracking-tighter">All Courses</h1>
+            <div className="pt-24 pb-20 px-4 min-h-screen">
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 pb-20 px-4">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <div key={i} className="-m-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 pb-20 px-4">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={i}>
                                 <VideoCardSkeleton />
                             </div>
                         ))}
                     </div>
                 ) : courses.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 pb-20 px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 pb-20 px-4">
                         {courses.map(course => (
-                            <div key={course.id} className="-m-1">
+                            <div key={course.id}>
                                 <VideoCard
                                     content={course}
                                     onClick={(content) => {

@@ -46,7 +46,7 @@ const SearchResults: React.FC = () => {
 
     return (
         <Layout>
-            <div className="pt-24 pb-20 px-4 md:px-8 max-w-[1800px] mx-auto min-h-screen">
+            <div className="pt-24 pb-20 px-4 min-h-screen">
                 <h1 className="text-2xl md:text-3xl font-bold mb-8 text-white">
                     Search Results for "<span className="text-zinc-400">{qStr}</span>"
                 </h1>

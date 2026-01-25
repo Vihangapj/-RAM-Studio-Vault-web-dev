@@ -51,25 +51,25 @@ const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
 
             {/* Hero Content */}
-            <div className="absolute bottom-[20%] left-4 md:left-12 max-w-2xl px-4">
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg tracking-tighter">
+            <div className="absolute bottom-[25%] left-0 max-w-2xl px-4">
+                <h1 className="text-4xl md:text-6xl font-gunterz-black text-white mb-8 drop-shadow-lg tracking-tighter">
                     {featuredContent.title}
                 </h1>
-                <p className="text-zinc-200 text-sm md:text-lg mb-6 line-clamp-3 drop-shadow-md font-medium max-w-lg">
+                <p className="text-zinc-200 text-sm md:text-lg mb-10 line-clamp-3 drop-shadow-md font-medium max-w-lg">
                     {featuredContent.description}
                 </p>
 
                 <div className="flex items-center gap-4">
                     <Link
                         to={`/watch/${featuredContent.id}`}
-                        className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded font-bold hover:bg-zinc-200 transition-colors"
+                        className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-200 transition-colors"
                     >
                         <Play className="w-5 h-5 fill-black" />
                         Play
                     </Link>
                     <button
                         onClick={() => setShowTrailer(true)}
-                        className="flex items-center gap-2 bg-zinc-600/80 text-white px-6 py-2 md:px-8 md:py-3 rounded font-bold hover:bg-zinc-600 transition-colors backdrop-blur-sm"
+                        className="flex items-center gap-2 bg-zinc-600/80 text-white px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-600 transition-colors backdrop-blur-sm"
                     >
                         <Info className="w-5 h-5" />
                         Watch Trailer

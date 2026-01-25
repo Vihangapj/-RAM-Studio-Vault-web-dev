@@ -57,15 +57,15 @@ const Watch: React.FC = () => {
 
     return (
         <Layout hideFooter={true}>
-            {/* Structural fix: Added max-w-7xl and mx-auto to prevent stretching on large screens */}
-            <div className="pt-24 px-4 min-h-screen max-w-7xl mx-auto">
+            {/* max-w-screen-2xl මගින් content එකට ඉතා වැඩි පළලක් ලබා දෙයි */}
+            <div className="pt-24 px-4 md:px-8 min-h-screen max-w-screen-2xl mx-auto">
 
-                {/* Structural fix: Using 12-column grid for better control over the gap */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Gap එක 10 දක්වා වැඩි කර වීඩියෝව සහ ලිස්ට් එක අතර පැහැදිලි බවක් ලබා දී ඇත */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     
-                    {/* Main Player Column - Taking 8 of 12 columns */}
+                    {/* Video Column: columns 12න් 8ක් ලබා දී ඇත */}
                     <div className="lg:col-span-8 lg:sticky lg:top-24 space-y-6">
-                        {/* 16:9 Player Container */}
+                        {/* 16:9 Player Container - max-h ඉවත් කළේ width එකට සාපේක්ෂව වීඩියෝව ලොකු වීමටයි */}
                         <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                             <iframe
                                 src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=0&modestbranding=1&rel=0`}
@@ -83,15 +83,14 @@ const Watch: React.FC = () => {
                                     {content.title} • Lesson {activeLessonIndex + 1} of {content.lessons?.length}
                                 </p>
                             )}
-                            <p className="text-zinc-300 leading-relaxed max-w-3xl">
+                            <p className="text-zinc-300 leading-relaxed max-w-4xl">
                                 {content.description}
                             </p>
                         </div>
                     </div>
 
-                    {/* Sidebar Column - Taking 4 of 12 columns */}
+                    {/* Sidebar Column: columns 12න් 4ක් ලබා දී ඇත */}
                     <div className="lg:col-span-4 space-y-6">
-                        {/* Course Playlist */}
                         {content.type === 'course' && content.lessons && (
                             <CoursePlaylist
                                 lessons={content.lessons}
@@ -100,7 +99,6 @@ const Watch: React.FC = () => {
                             />
                         )}
 
-                        {/* Lesson Resources (for courses) */}
                         {content.type === 'course' && content.lessons?.[activeLessonIndex]?.resources &&
                             content.lessons[activeLessonIndex].resources!.length > 0 && (
                                 <ResourceList
@@ -109,7 +107,6 @@ const Watch: React.FC = () => {
                                 />
                             )}
 
-                        {/* Course/Video Resources */}
                         {content.resources && content.resources.length > 0 && (
                             <ResourceList
                                 resources={content.resources}

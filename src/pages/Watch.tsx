@@ -57,17 +57,20 @@ const Watch: React.FC = () => {
 
     return (
         <Layout hideFooter={true}>
-            <div className="pt-24 px-4 min-h-screen">
+            {/* Structural fix: Added max-w-7xl and mx-auto to prevent stretching on large screens */}
+            <div className="pt-24 px-4 min-h-screen max-w-7xl mx-auto">
 
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                    {/* Main Player Column - Sticky on large screens */}
-                    <div className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
+                {/* Structural fix: Using 12-column grid for better control over the gap */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    {/* Main Player Column - Taking 8 of 12 columns */}
+                    <div className="lg:col-span-8 lg:sticky lg:top-24 space-y-6">
                         {/* 16:9 Player Container */}
-                        <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 max-h-[28rem]">
+                        <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                             <iframe
                                 src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=0&modestbranding=1&rel=0`}
                                 title={currentTitle}
-                                className="w-full h-full"
+                                className="w-full h-full border-0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                             />
@@ -86,8 +89,8 @@ const Watch: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Sidebar Column */}
-                    <div className="lg:col-span-2 space-y-6">
+                    {/* Sidebar Column - Taking 4 of 12 columns */}
+                    <div className="lg:col-span-4 space-y-6">
                         {/* Course Playlist */}
                         {content.type === 'course' && content.lessons && (
                             <CoursePlaylist

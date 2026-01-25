@@ -67,7 +67,7 @@ const Home: React.FC = () => {
 
     return (
         <Layout>
-            <Hero featuredContent={featured} />
+            <Hero featuredContent={featured} onPlayClick={handleContentClick} />
 
             <div className="pb-20 -mt-20 relative z-20 md:-mt-40 space-y-4 md:space-y-8">
                 {contents.length > 0 ? (

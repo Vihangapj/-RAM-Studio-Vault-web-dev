@@ -4,14 +4,14 @@
 
 @font-face {
   font-family: 'Gunterz-Black';
-  src: url('./assets/fonts/Fontspring-DEMO-gunterz-black.otf') format('opentype');
+  src: url('./assets/fonts/Fontspring-DEMO-gunterz-bold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gunterz-BoldItalic';
-  src: url('./assets/fonts/Fontspring-DEMO-gunterz-bolditalic.otf') format('opentype');
+  src: url('./assets/fonts/Fontspring-DEMO-gunterz-mediumitalic.otf') format('opentype');
   font-weight: bold;
   font-style: italic;
 }

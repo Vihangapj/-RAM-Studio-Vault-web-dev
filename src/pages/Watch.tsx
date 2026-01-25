@@ -59,9 +59,9 @@ const Watch: React.FC = () => {
         <Layout hideFooter={true}>
             <div className="pt-24 px-4 min-h-screen">
 
-                <div className="flex flex-col lg:flex-row gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                     {/* Main Player Column - Sticky on large screens */}
-                    <div className="lg:w-3/5 lg:sticky lg:top-24 lg:self-start space-y-6">
+                    <div className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
                         {/* 16:9 Player Container */}
                         <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 max-h-[28rem]">
                             <iframe
@@ -87,7 +87,7 @@ const Watch: React.FC = () => {
                     </div>
 
                     {/* Sidebar Column */}
-                    <div className="lg:w-2/5 space-y-6">
+                    <div className="lg:col-span-2 space-y-6">
                         {/* Course Playlist */}
                         {content.type === 'course' && content.lessons && (
                             <CoursePlaylist

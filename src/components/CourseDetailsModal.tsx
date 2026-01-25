@@ -32,8 +32,8 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
     };
 
     return (
-        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4">
-            <div className="relative w-full max-w-4xl max-h-[90vh] bg-zinc-900 rounded-xl overflow-hidden shadow-2xl border border-zinc-800">
+        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4" onClick={onClose}>
+            <div className="relative w-full max-w-4xl max-h-[90vh] bg-zinc-900 rounded-xl overflow-hidden shadow-2xl border border-zinc-800 mt-20" onClick={(e) => e.stopPropagation()}>
                 {/* Close Button */}
                 <button
                     onClick={onClose}
@@ -136,12 +136,6 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                                 <Play className="w-5 h-5" />
                                 Start Course
                             </Link>
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-3 bg-zinc-800 text-white rounded-lg font-semibold hover:bg-zinc-700 transition-colors"
-                            >
-                                Close
-                            </button>
                         </div>
                     </div>
                 </div>

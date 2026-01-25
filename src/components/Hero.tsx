@@ -1,13 +1,13 @@
 import React from 'react';
 import type { Content } from '../types/types';
-import { Play, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Play, Info, X } from 'lucide-react';
 
 interface HeroProps {
     featuredContent: Content | null; // Can be null if loading
+    onPlayClick?: (content: Content) => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
+const Hero: React.FC<HeroProps> = ({ featuredContent, onPlayClick }) => {
     const [showTrailer, setShowTrailer] = React.useState(false);
     const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
@@ -51,7 +51,7 @@ const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
 
             {/* Hero Content */}
-            <div className="absolute bottom-[25%] left-0 max-w-2xl px-4">
+            <div className="absolute bottom-[30%] left-0 max-w-2xl px-4">
                 <h1 className="text-4xl md:text-6xl font-gunterz-black text-white mb-8 drop-shadow-lg tracking-tighter">
                     {featuredContent.title}
                 </h1>
@@ -60,13 +60,13 @@ const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
                 </p>
 
                 <div className="flex items-center gap-4">
-                    <Link
-                        to={`/watch/${featuredContent.id}`}
+                    <button
+                        onClick={() => onPlayClick && featuredContent && onPlayClick(featuredContent)}
                         className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-200 transition-colors"
                     >
                         <Play className="w-5 h-5 fill-black" />
                         Play
-                    </Link>
+                    </button>
                     <button
                         onClick={() => setShowTrailer(true)}
                         className="flex items-center gap-2 bg-zinc-600/80 text-white px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-600 transition-colors backdrop-blur-sm"
@@ -79,13 +79,13 @@ const Hero: React.FC<HeroProps> = ({ featuredContent }) => {
 
             {/* Trailer Modal */}
             {showTrailer && (
-                <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4">
-                    <div className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-zinc-800">
+                <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4" onClick={() => setShowTrailer(false)}>
+                    <div className="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-zinc-800" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setShowTrailer(false)}
                             className="absolute top-4 right-4 z-10 text-white bg-black/50 p-2 rounded-full hover:bg-white/20 transition-colors"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                            <X className="w-5 h-5" />
                         </button>
                         <iframe
                             className="w-full h-full"

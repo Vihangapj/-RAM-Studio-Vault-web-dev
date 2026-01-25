@@ -39,7 +39,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ title, contents, loading = fals
 
                 <div
                     ref={rowRef}
-                    className="flex flex-nowrap items-stretch gap-3 md:gap-4 overflow-x-auto overflow-y-visible scrollbar-hide scroll-smooth px-4 py-4"
+                    className="flex flex-nowrap items-stretch gap-4 overflow-x-auto overflow-y-visible scrollbar-hide scroll-smooth px-4 py-4"
                 >
                     {loading
                         ? Array.from({ length: 6 }).map((_, i) => (

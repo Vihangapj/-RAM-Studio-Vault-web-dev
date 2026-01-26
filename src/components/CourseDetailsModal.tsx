@@ -12,6 +12,8 @@ interface CourseDetailsModalProps {
 const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen, onClose }) => {
     if (!isOpen) return null;
 
+    const [selectedThumbIndex, setSelectedThumbIndex] = React.useState(0);
+
     const totalLessons = content.lessons?.length || 0;
     // Calculate total duration if lessons have durationSeconds
     const lessonDurations = content.lessons?.map(l => l.durationSeconds).filter(Boolean) as number[] | undefined;
@@ -20,7 +22,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
         : undefined;
 
     const formatDuration = (seconds?: number) => {
-        if (seconds === undefined) return '—';
+        if (seconds === undefined) return '';
         if (seconds >= 3600) {
             const h = Math.floor(seconds / 3600);
             const m = Math.floor((seconds % 3600) / 60);
@@ -30,6 +32,12 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
         const s = seconds % 60;
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
+
+    const allImages = [content.thumbnailUrl, ...(content.thumbnails || [])];
+
+    React.useEffect(() => {
+        setSelectedThumbIndex(0);
+    }, [content.id]);
 
     return (
         <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4" onClick={onClose}>
@@ -46,7 +54,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                     {/* Hero Section */}
                     <div className="relative">
                         <img
-                            src={content.thumbnailUrl}
+                            src={allImages[selectedThumbIndex]}
                             alt={content.title}
                             className="w-full h-64 object-cover"
                         />
@@ -58,30 +66,48 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                                     <BookOpen className="w-4 h-4" />
                                     {totalLessons} Lessons
                                 </span>
-                                <span className="flex items-center gap-1">
-                                    <Clock className="w-4 h-4" />
-                                    {totalDurationSeconds !== undefined ? formatDuration(totalDurationSeconds) : '—'}
-                                </span>
+                                {totalDurationSeconds !== undefined && (
+                                    <span className="flex items-center gap-1">
+                                        <Clock className="w-4 h-4" />
+                                        {formatDuration(totalDurationSeconds)}
+                                    </span>
+                                )}
                                 <span className="text-sm bg-zinc-800 px-2 py-1 rounded">
                                     {content.category}
                                 </span>
                             </div>
                         </div>
+
+                        {/* Thumbnails strip */}
+                        {allImages.length > 1 && (
+                            <div className="absolute -bottom-8 left-4 right-4">
+                                <div className="flex items-center gap-2 overflow-x-auto py-2">
+                                    {allImages.map((img, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setSelectedThumbIndex(idx)}
+                                            className={`w-20 h-12 rounded overflow-hidden border-2 ${selectedThumbIndex === idx ? 'border-white' : 'border-transparent'} focus:outline-none`}
+                                        >
+                                            <img src={img} alt={`${content.title}-thumb-${idx}`} className="w-full h-full object-cover" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Content */}
                     <div className="p-4 space-y-6">
                         {/* Description */}
                         <div>
-                            <div className="flex items-start justify-between">
-                                <h2 className="text-xl font-gunterz-black text-white mb-3">About this course</h2>
+                            <div className="flex items-start justify-end mb-3">
                                 <Link
                                     to={`/watch/${content.id}?lesson=0`}
                                     onClick={onClose}
-                                    className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors ml-4"
+                                    className="inline-flex items-center gap-2 bg-white text-black px-6 py-2 rounded-lg font-gunterz-black italic hover:bg-zinc-200 transition-colors"
                                 >
-                                    <Play className="w-5 h-5" />
-                                    Start Course
+                                    <Play className="w-5 h-5 fill-current" />
+                                    START
                                 </Link>
                             </div>
                             <p className="text-zinc-300 leading-relaxed">{content.description}</p>
@@ -90,7 +116,6 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                         {/* Lessons Preview */}
                         {content.lessons && content.lessons.length > 0 && (
                             <div>
-                                <h2 className="text-xl font-gunterz-black text-white mb-3">Course Syllabus</h2>
                                 <div className="space-y-2 max-h-96 overflow-y-auto">
                                     {content.lessons.slice(0, 5).map((lesson, idx) => (
                                         <Link
@@ -105,7 +130,9 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                                                 </div>
                                                 <div className="flex-1">
                                                     <h3 className="text-white font-medium">{lesson.title}</h3>
-                                                    <p className="text-zinc-400 text-sm">{lesson.durationSeconds ? formatDuration(lesson.durationSeconds) : '—'}</p>
+                                                    {lesson.durationSeconds && (
+                                                        <p className="text-zinc-400 text-sm">{formatDuration(lesson.durationSeconds)}</p>
+                                                    )}
                                                 </div>
                                                 {lesson.resources && lesson.resources.length > 0 && (
                                                     <ExternalLink className="w-4 h-4 text-zinc-400" />
@@ -142,8 +169,6 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                                 </div>
                             </div>
                         )}
-
-                        {/* Action Buttons (moved into hero) */}
                     </div>
                 </div>
             </div>

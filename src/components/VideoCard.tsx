@@ -17,21 +17,26 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
     const intervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
     React.useEffect(() => {
-        if (isHovered && content.thumbnails && content.thumbnails.length > 0) {
+        if (!isHovered) {
+            setCurrentThumbIndex(0);
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            return;
+        }
+
+        // Only cycle thumbnails when hovered and there's no youtubeId preview available
+        if (isHovered && (!content.youtubeId || content.youtubeId === '') && content.thumbnails && content.thumbnails.length > 0) {
             intervalRef.current = setInterval(() => {
                 setCurrentThumbIndex(prev => {
                     const totalImages = (content.thumbnails?.length || 0) + 1;
                     return (prev + 1) % totalImages;
                 });
             }, 1000); // Fast cycle on hover
-        } else {
-            setCurrentThumbIndex(0);
-            if (intervalRef.current) clearInterval(intervalRef.current);
         }
+
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [isHovered, content.thumbnails]);
+    }, [isHovered, content.thumbnails, content.youtubeId]);
 
     const displayThumb = React.useMemo(() => {
         const allImages = [content.thumbnailUrl, ...(content.thumbnails || [])];
@@ -63,24 +68,36 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
                     transition: { duration: 0.2, ease: 'easeOut' }
                 }}
             >
-                {/* Thumbnail Image */}
-                {content.thumbnailUrl && !imageError ? (
-                    <img
-                        src={displayThumb}
-                        alt={content.title}
-                        loading="lazy"
-                        onError={() => setImageError(true)}
-                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                {/* If hovered and we have a YouTube id, show a muted autoplay iframe preview */}
+                {isHovered && content.youtubeId ? (
+                    <iframe
+                        title={`preview-${content.id}`}
+                        src={`https://www.youtube.com/embed/${content.youtubeId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&vq=small`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        frameBorder="0"
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        allowFullScreen={false}
                     />
                 ) : (
-                    <div className="absolute inset-0 w-full h-full bg-zinc-800 flex items-center justify-center">
-                        <div className="text-center">
-                            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-zinc-700 flex items-center justify-center">
-                                <Play className="w-5 h-5 text-zinc-500" />
+                    // Thumbnail Image
+                    (content.thumbnailUrl && !imageError) ? (
+                        <img
+                            src={displayThumb}
+                            alt={content.title}
+                            loading="lazy"
+                            onError={() => setImageError(true)}
+                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                        />
+                    ) : (
+                        <div className="absolute inset-0 w-full h-full bg-zinc-800 flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-zinc-700 flex items-center justify-center">
+                                    <Play className="w-5 h-5 text-zinc-500" />
+                                </div>
+                                <span className="text-zinc-500 font-medium text-xs uppercase tracking-wider">{content.title?.slice(0, 20) || 'No Title'}</span>
                             </div>
-                            <span className="text-zinc-500 font-medium text-xs uppercase tracking-wider">{content.title?.slice(0, 20) || 'No Title'}</span>
                         </div>
-                    </div>
+                    )
                 )}
 
                 {/* Always visible gradient overlay for title */}

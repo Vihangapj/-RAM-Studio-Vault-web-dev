@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-// Icons are imported here
-import { Search, Menu, X, BookOpen, Shield } from 'lucide-react';
+import { Search, Menu, X } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 const Navbar: React.FC = () => {
@@ -14,7 +13,6 @@ const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Check if current path matches the link
     const isActive = (path: string) => location.pathname === path;
 
     const handleSearch = (e: React.FormEvent) => {
@@ -34,52 +32,67 @@ const Navbar: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // මෙනුව ඇරෙනකොට පිටුපස scroll එක disable කිරීම
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [isMobileMenuOpen]);
+
     return (
         <>
             <nav
                 className={`fixed top-0 w-full z-50 transition-all duration-300 h-16 md:h-20 ${
                     isScrolled
-                        ? 'bg-black/95 backdrop-blur-md' // No white line at bottom
+                        ? 'bg-black/95 backdrop-blur-md'
                         : 'bg-gradient-to-b from-black/90 to-transparent'
                 }`}
             >
                 <div className="max-w-[1800px] mx-auto h-full px-4 md:px-8 flex items-center justify-between">
                     
-                    {/* LEFT SIDE: Logo & Desktop Links */}
                     <div className="flex items-center h-full gap-4 md:gap-10">
                         <Link to="/" className="flex items-center mr-4">
                             <img src={logo} alt="RAM Studio Vault" className="h-8 md:h-10 w-auto" />
                         </Link>
 
+                        {/* Desktop Links */}
                         <div className="hidden md:flex items-center h-full text-xs lg:text-sm font-gunterz-bold-italic tracking-wider uppercase">
                             <Link 
                                 to="/courses" 
-                                className={`h-full flex items-center px-8 transition-all duration-200 ${
-                                    isActive('/courses') 
-                                    ? 'bg-white text-black' 
-                                    : 'text-zinc-300 hover:bg-white/10 hover:text-white'
+                                className={`relative h-full flex items-center px-8 transition-colors duration-300 group overflow-hidden ${
+                                    isActive('/courses') ? 'text-black' : 'text-zinc-300 hover:text-black'
                                 }`}
                             >
-                                Courses
+                                <span className="relative z-10">Courses</span>
+                                <span className={`absolute inset-0 bg-white transition-transform duration-300 ease-out ${
+                                    isActive('/courses') 
+                                    ? 'scale-y-100' 
+                                    : 'scale-y-0 origin-top group-hover:scale-y-100 group-hover:origin-bottom'
+                                }`}></span>
                             </Link>
 
                             {isAdmin && (
                                 <Link 
                                     to="/admin" 
-                                    className={`h-full flex items-center px-8 transition-all duration-200 ${
-                                        isActive('/admin') 
-                                        ? 'bg-red-600 text-white' 
-                                        : 'text-red-500 hover:bg-red-600/10'
+                                    className={`relative h-full flex items-center px-8 transition-colors duration-300 group overflow-hidden ${
+                                        isActive('/admin') ? 'text-white' : 'text-red-500 hover:text-white'
                                     }`}
                                 >
-                                    Admin
+                                    <span className="relative z-10">Admin</span>
+                                    <span className={`absolute inset-0 bg-red-600 transition-transform duration-300 ease-out ${
+                                        isActive('/admin') 
+                                        ? 'scale-y-100' 
+                                        : 'scale-y-0 origin-top group-hover:scale-y-100 group-hover:origin-bottom'
+                                    }`}></span>
                                 </Link>
                             )}
                         </div>
                     </div>
 
-                    {/* RIGHT SIDE: Search & Mobile Toggle */}
                     <div className="flex items-center gap-3 md:gap-6">
+                        {/* Desktop Search */}
                         <form onSubmit={handleSearch} className="relative group hidden md:block">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-white transition-colors" />
                             <input
@@ -87,57 +100,83 @@ const Navbar: React.FC = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search..."
-                                className="bg-zinc-800/50 border border-zinc-700/50 rounded-none pl-9 pr-4 py-2 text-sm w-36 focus:w-64 focus:bg-zinc-800 focus:border-zinc-500 transition-all focus:outline-none text-white placeholder-zinc-500"
+                                className="bg-zinc-800/50 border border-zinc-700/50 rounded-full pl-9 pr-4 py-2 text-sm w-36 focus:w-64 focus:bg-zinc-800 focus:border-zinc-500 transition-all focus:outline-none text-white placeholder-zinc-500"
                             />
                         </form>
 
+                        {/* Mobile Menu Button */}
                         <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden p-2 text-zinc-400 hover:text-white transition-colors"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="md:hidden p-2 text-zinc-300 hover:text-white"
                         >
-                            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            <Menu className="w-6 h-6" />
                         </button>
                     </div>
                 </div>
             </nav>
 
-            {/* MOBILE MENU */}
-            <div
-                className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
-                    isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'
+            {/* --- Mobile Side Menu --- */}
+            
+            {/* Backdrop Overlay */}
+            <div 
+                className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 md:hidden ${
+                    isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
                 }`}
-            >
-                <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setIsMobileMenuOpen(false)} />
+                onClick={() => setIsMobileMenuOpen(false)}
+            />
 
-                <div className={`absolute top-0 right-0 w-72 h-full bg-zinc-900 border-l border-white/10 transform transition-transform duration-300 ${
-                    isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}>
-                    <div className="p-6 flex flex-col gap-4 mt-20">
-                        {/* BookOpen icon used here to fix unused import error */}
+            {/* Side Drawer */}
+            <div className={`fixed top-0 right-0 h-full w-[280px] bg-zinc-950 z-[70] shadow-2xl transition-transform duration-300 ease-in-out transform md:hidden ${
+                isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}>
+                <div className="flex flex-col h-full p-6">
+                    {/* Close Button */}
+                    <div className="flex justify-end mb-8">
+                        <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 hover:text-white">
+                            <X className="w-7 h-7" />
+                        </button>
+                    </div>
+
+                    {/* Mobile Search Input */}
+                    <form onSubmit={handleSearch} className="mb-10 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search content..."
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-zinc-600 text-white placeholder-zinc-600"
+                        />
+                    </form>
+
+                    {/* Navigation Links */}
+                    <div className="space-y-6">
                         <Link 
                             to="/courses" 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className={`flex items-center gap-3 p-4 rounded-lg font-gunterz-bold-italic uppercase transition-colors ${
-                                isActive('/courses') ? 'bg-white text-black' : 'text-zinc-300 bg-white/5'
+                            className={`block text-lg font-gunterz-bold-italic tracking-wider uppercase ${
+                                isActive('/courses') ? 'text-white border-l-4 border-white pl-4' : 'text-zinc-400 pl-4'
                             }`}
                         >
-                            <BookOpen className="w-5 h-5" />
-                            <span>Courses</span>
+                            Courses
                         </Link>
-
-                        {/* Shield icon used here to fix unused import error */}
+                        
                         {isAdmin && (
                             <Link 
                                 to="/admin" 
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className={`flex items-center gap-3 p-4 rounded-lg font-gunterz-bold-italic uppercase transition-colors ${
-                                    isActive('/admin') ? 'bg-red-600 text-white' : 'text-red-500 bg-red-500/10'
+                                className={`block text-lg font-gunterz-bold-italic tracking-wider uppercase ${
+                                    isActive('/admin') ? 'text-red-600 border-l-4 border-red-600 pl-4' : 'text-red-500/70 pl-4'
                                 }`}
                             >
-                                <Shield className="w-5 h-5" />
-                                <span>Admin Panel</span>
+                                Admin Panel
                             </Link>
                         )}
+                    </div>
+
+                    {/* Footer Info (Optional) */}
+                    <div className="mt-auto pt-10">
+                        <p className="text-[10px] text-zinc-600 uppercase tracking-[0.2em]">RAM Studio Vault v1.0</p>
                     </div>
                 </div>
             </div>

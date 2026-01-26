@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { db } from '../utils/firebase';
 import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
@@ -12,6 +12,8 @@ const Watch: React.FC = () => {
     const [content, setContent] = useState<Content | null>(null);
     const [activeLessonIndex, setActiveLessonIndex] = useState(0);
 
+    const location = useLocation();
+
     useEffect(() => {
         const fetchContent = async () => {
             if (!id) return;
@@ -22,6 +24,22 @@ const Watch: React.FC = () => {
                 if (docSnap.exists()) {
                     const data = { id: docSnap.id, ...docSnap.data() } as Content;
                     setContent(data);
+
+                    // Determine initial lesson index from location state or query param
+                    let initialIndex = 0;
+                    const stateInitial = (location.state as any)?.initialLesson;
+                    if (typeof stateInitial === 'number' && data.lessons) {
+                        initialIndex = Math.max(0, Math.min(stateInitial, data.lessons.length - 1));
+                    } else {
+                        const sp = new URLSearchParams(location.search);
+                        const p = sp.get('lesson');
+                        if (p !== null && !isNaN(Number(p)) && data.lessons) {
+                            const parsed = Math.max(0, Math.min(Number(p), data.lessons.length - 1));
+                            initialIndex = parsed;
+                        }
+                    }
+
+                    setActiveLessonIndex(initialIndex);
 
                     // Increment views
                     await updateDoc(docRef, {

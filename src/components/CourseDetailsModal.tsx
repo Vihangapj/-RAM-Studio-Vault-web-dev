@@ -52,8 +52,8 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
                         <div className="absolute bottom-4 left-4 right-4">
-                            <h1 className="text-3xl font-gunterz-black text-white mb-2">{content.title}</h1>
-                            <div className="flex items-center gap-4 text-zinc-300">
+                            <h1 className="text-3xl font-gunterz-black text-white mb-3">{content.title}</h1>
+                            <div className="flex items-center gap-4 text-zinc-300 mb-3">
                                 <span className="flex items-center gap-1">
                                     <BookOpen className="w-4 h-4" />
                                     {totalLessons} Lessons
@@ -73,7 +73,17 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                     <div className="p-4 space-y-6">
                         {/* Description */}
                         <div>
-                            <h2 className="text-xl font-gunterz-black text-white mb-3">About this course</h2>
+                            <div className="flex items-start justify-between">
+                                <h2 className="text-xl font-gunterz-black text-white mb-3">About this course</h2>
+                                <Link
+                                    to={`/watch/${content.id}?lesson=0`}
+                                    onClick={onClose}
+                                    className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors ml-4"
+                                >
+                                    <Play className="w-5 h-5" />
+                                    Start Course
+                                </Link>
+                            </div>
                             <p className="text-zinc-300 leading-relaxed">{content.description}</p>
                         </div>
 
@@ -83,18 +93,25 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                                 <h2 className="text-xl font-gunterz-black text-white mb-3">Course Syllabus</h2>
                                 <div className="space-y-2 max-h-96 overflow-y-auto">
                                     {content.lessons.slice(0, 5).map((lesson, idx) => (
-                                        <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
-                                            <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">
-                                                {idx + 1}
+                                        <Link
+                                            key={idx}
+                                            to={`/watch/${content.id}?lesson=${idx}`}
+                                            onClick={onClose}
+                                            className="block"
+                                        >
+                                            <div className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800/60 transition-colors">
+                                                <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">
+                                                    {idx + 1}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="text-white font-medium">{lesson.title}</h3>
+                                                    <p className="text-zinc-400 text-sm">{lesson.durationSeconds ? formatDuration(lesson.durationSeconds) : '—'}</p>
+                                                </div>
+                                                {lesson.resources && lesson.resources.length > 0 && (
+                                                    <ExternalLink className="w-4 h-4 text-zinc-400" />
+                                                )}
                                             </div>
-                                            <div className="flex-1">
-                                                <h3 className="text-white font-medium">{lesson.title}</h3>
-                                                <p className="text-zinc-400 text-sm">{lesson.durationSeconds ? formatDuration(lesson.durationSeconds) : '—'}</p>
-                                            </div>
-                                            {lesson.resources && lesson.resources.length > 0 && (
-                                                <ExternalLink className="w-4 h-4 text-zinc-400" />
-                                            )}
-                                        </div>
+                                        </Link>
                                     ))}
                                     {content.lessons.length > 5 && (
                                         <p className="text-zinc-400 text-sm text-center py-2">
@@ -126,17 +143,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ content, isOpen
                             </div>
                         )}
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-3 pt-4">
-                            <Link
-                                to={`/watch/${content.id}`}
-                                onClick={onClose}
-                                className="flex-1 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <Play className="w-5 h-5" />
-                                Start Course
-                            </Link>
-                        </div>
+                        {/* Action Buttons (moved into hero) */}
                     </div>
                 </div>
             </div>

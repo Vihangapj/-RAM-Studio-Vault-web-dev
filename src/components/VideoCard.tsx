@@ -1,20 +1,27 @@
 import React from 'react';
+import { db } from '../utils/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
 import type { Content } from '../types/types';
 import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { parseYoutubeId } from '../utils/youtube';
 
 interface VideoCardProps {
     content: Content;
     onClick?: (content: Content) => void;
+    variant?: 'fixed' | 'fluid';
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ content, onClick, variant = 'fixed' }) => {
     const navigate = useNavigate();
     const [imageError, setImageError] = React.useState(false);
     const [currentThumbIndex, setCurrentThumbIndex] = React.useState(0);
     const [isHovered, setIsHovered] = React.useState(false);
     const intervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [filterMap, setFilterMap] = React.useState<Record<string, string>>({});
+
+    const parsedPreviewId = parseYoutubeId((content as any).youtubeId as string | undefined);
 
     React.useEffect(() => {
         if (!isHovered) {
@@ -24,7 +31,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
         }
 
         // Only cycle thumbnails when hovered and there's no youtubeId preview available
-        if (isHovered && (!content.youtubeId || content.youtubeId === '') && content.thumbnails && content.thumbnails.length > 0) {
+        if (isHovered && (!parsedPreviewId) && content.thumbnails && content.thumbnails.length > 0) {
             intervalRef.current = setInterval(() => {
                 setCurrentThumbIndex(prev => {
                     const totalImages = (content.thumbnails?.length || 0) + 1;
@@ -37,6 +44,27 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
     }, [isHovered, content.thumbnails, content.youtubeId]);
+
+    React.useEffect(() => {
+        let mounted = true;
+        const fetchFilters = async () => {
+            try {
+                const snap = await getDocs(collection(db, 'filterCategories'));
+                const map: Record<string, string> = {};
+                snap.docs.forEach(d => {
+                    const data = d.data() as any;
+                    (data.options || []).forEach((opt: any) => {
+                        map[opt.id] = opt.label;
+                    });
+                });
+                if (mounted) setFilterMap(map);
+            } catch (err) {
+                // ignore
+            }
+        };
+        fetchFilters();
+        return () => { mounted = false; };
+    }, []);
 
     const displayThumb = React.useMemo(() => {
         const allImages = [content.thumbnailUrl, ...(content.thumbnails || [])];
@@ -54,7 +82,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
     return (
         <div
             className="block flex-shrink-0 cursor-pointer"
-            style={{ width: '280px', minWidth: '280px' }}
+            style={variant === 'fixed' ? { width: '280px', minWidth: '280px' } : { width: '100%' }}
             onClick={handleClick}
         >
             <motion.div
@@ -69,10 +97,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
                 }}
             >
                 {/* If hovered and we have a YouTube id, show a muted autoplay iframe preview */}
-                {isHovered && content.youtubeId ? (
+                {isHovered && parsedPreviewId ? (
                     <iframe
                         title={`preview-${content.id}`}
-                        src={`https://www.youtube.com/embed/${content.youtubeId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&vq=small`}
+                        src={`https://www.youtube.com/embed/${parsedPreviewId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&vq=small`}
                         className="absolute inset-0 w-full h-full object-cover"
                         frameBorder="0"
                         allow="autoplay; encrypted-media; picture-in-picture"
@@ -103,18 +131,24 @@ const VideoCard: React.FC<VideoCardProps> = ({ content, onClick }) => {
                 {/* Always visible gradient overlay for title */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-                {/* Title always visible at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <h3 className="text-white font-semibold text-sm drop-shadow-md line-clamp-1">{content.title}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-white uppercase">
-                            {content.type === 'course' ? 'Course' : 'Video'}
-                        </span>
-                        {content.category && (
-                            <span className="text-[10px] text-zinc-400">{content.category}</span>
-                        )}
+                {/* Title always visible at bottom - Conditionally rendered */}
+                {(content.showTitleOnThumbnail !== false) && (
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="text-white font-semibold text-sm drop-shadow-md line-clamp-1">{content.title}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                            {(content as any).filters && Object.values((content as any).filters).flat().length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {((Object.values((content as any).filters) as any[]).flat() as string[])
+                                        .map(id => filterMap[id] || id)
+                                        .slice(0, 3)
+                                        .map((label, idx) => (
+                                            <span key={idx} className="text-[10px] text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">{label}</span>
+                                        ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Hover Overlay with Play Button */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">

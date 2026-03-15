@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import type { Content } from '../types/types';
 import ResourceList from '../components/ResourceList';
 import CoursePlaylist from '../components/CoursePlaylist';
+import { parseYoutubeId } from '../utils/youtube';
 
 const Watch: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -64,12 +65,18 @@ const Watch: React.FC = () => {
         );
     }
 
-    // Determine current video ID
-    const currentVideoId = content.type === 'course' && content.lessons
+    const isCourseLike = Array.isArray((content as any).lessons) && (content as any).lessons.length > 0;
+
+    // Determine current video ID (parse full URLs if present)
+    const rawVideoId = isCourseLike && content.lessons
         ? content.lessons[activeLessonIndex]?.youtubeId
         : content.youtubeId;
+    // parse potential URL into ID
+    let currentVideoId = rawVideoId;
+    const pid = parseYoutubeId(rawVideoId as string | undefined);
+    if (pid) currentVideoId = pid;
 
-    const currentTitle = content.type === 'course' && content.lessons
+    const currentTitle = isCourseLike && content.lessons
         ? content.lessons[activeLessonIndex]?.title
         : content.title;
 
@@ -80,7 +87,7 @@ const Watch: React.FC = () => {
 
                 {/* Gap එක 10 දක්වා වැඩි කර වීඩියෝව සහ ලිස්ට් එක අතර පැහැදිලි බවක් ලබා දී ඇත */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    
+
                     {/* Video Column: columns 12න් 8ක් ලබා දී ඇත */}
                     <div className="lg:col-span-8 lg:sticky lg:top-24 space-y-6">
                         {/* 16:9 Player Container - max-h ඉවත් කළේ width එකට සාපේක්ෂව වීඩියෝව ලොකු වීමටයි */}
@@ -95,8 +102,8 @@ const Watch: React.FC = () => {
                         </div>
 
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">{currentTitle}</h1>
-                            {content.type === 'course' && (
+                            <h1 className="text-2xl md:text-3xl font-google-sans font-normal mb-2">{currentTitle}</h1>
+                            {isCourseLike && (
                                 <p className="text-zinc-400 text-sm mb-4">
                                     {content.title} • Lesson {activeLessonIndex + 1} of {content.lessons?.length}
                                 </p>
@@ -109,7 +116,7 @@ const Watch: React.FC = () => {
 
                     {/* Sidebar Column: columns 12න් 4ක් ලබා දී ඇත */}
                     <div className="lg:col-span-4 space-y-6">
-                        {content.type === 'course' && content.lessons && (
+                        {isCourseLike && content.lessons && (
                             <CoursePlaylist
                                 lessons={content.lessons}
                                 currentIndex={activeLessonIndex}
@@ -117,18 +124,18 @@ const Watch: React.FC = () => {
                             />
                         )}
 
-                        {content.type === 'course' && content.lessons?.[activeLessonIndex]?.resources &&
+                        {isCourseLike && content.lessons?.[activeLessonIndex]?.resources &&
                             content.lessons[activeLessonIndex].resources!.length > 0 && (
                                 <ResourceList
                                     resources={content.lessons[activeLessonIndex].resources!}
-                                    title="Lesson Resources"
+                                    title="Resources"
                                 />
                             )}
 
                         {content.resources && content.resources.length > 0 && (
                             <ResourceList
                                 resources={content.resources}
-                                title={content.type === 'course' ? 'Course Resources' : 'Resources'}
+                                title={isCourseLike ? 'Course Resources' : 'Resources'}
                             />
                         )}
                     </div>

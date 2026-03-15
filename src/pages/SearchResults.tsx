@@ -6,12 +6,15 @@ import type { Content } from '../types/types';
 import VideoCard from '../components/VideoCard';
 import VideoCardSkeleton from '../components/VideoCardSkeleton';
 import { useSearchParams } from 'react-router-dom';
+import CourseDetailsModal from '../components/CourseDetailsModal';
 
 const SearchResults: React.FC = () => {
     const [searchParams] = useSearchParams();
     const qStr = searchParams.get('q') || '';
     const [results, setResults] = React.useState<Content[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [selectedCourse, setSelectedCourse] = React.useState<Content | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
 
     React.useEffect(() => {
         const fetchAndFilter = async () => {
@@ -26,7 +29,7 @@ const SearchResults: React.FC = () => {
                 const filtered = allData.filter(item =>
                     (item.title?.toLowerCase() || '').includes(searchLower) ||
                     (item.description?.toLowerCase() || '').includes(searchLower) ||
-                    (item.category?.toLowerCase() || '').includes(searchLower)
+                    ((item as any).categories ? (item as any).categories.join(' ').toLowerCase() : '').includes(searchLower)
                 );
                 setResults(filtered);
             } catch (error) {
@@ -52,19 +55,23 @@ const SearchResults: React.FC = () => {
                 </h1>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 pb-20 px-4">
                         {Array.from({ length: 8 }).map((_, i) => (
                             <VideoCardSkeleton key={i} />
                         ))}
                     </div>
                 ) : results.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 pb-20 px-4">
                         {results.map(item => (
-                            <VideoCard key={item.id} content={item} />
+                            <VideoCard key={item.id} content={item} onClick={(c) => { setSelectedCourse(c); setShowModal(true); }} />
                         ))}
                     </div>
                 ) : (
                     <div className="text-zinc-500">No results found matching your query.</div>
+                )}
+
+                {selectedCourse && (
+                    <CourseDetailsModal content={selectedCourse} isOpen={showModal} onClose={() => { setShowModal(false); setSelectedCourse(null); }} />
                 )}
             </div>
         </Layout>

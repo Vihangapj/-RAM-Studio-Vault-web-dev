@@ -7,12 +7,14 @@ interface AuthContextType {
     currentUser: User | null;
     loading: boolean;
     isAdmin: boolean;
+    adminLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
     currentUser: null,
     loading: true,
     isAdmin: false
+    , adminLoading: true
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -24,24 +26,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [adminLoading, setAdminLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
+
+            // Stop blocking UI; show app immediately and check admin status in background.
+            setLoading(false);
+
             if (user) {
-                try {
-                    // Check if document exists in 'admins' collection with user's UID
-                    const adminDocRef = doc(db, 'admins', user.uid);
-                    const adminDoc = await getDoc(adminDocRef);
-                    setIsAdmin(adminDoc.exists());
-                } catch (error) {
-                    console.error("Error checking admin status:", error);
-                    setIsAdmin(false);
-                }
+                setAdminLoading(true);
+                (async () => {
+                    try {
+                        const adminDocRef = doc(db, 'admins', user.uid);
+
+                        // race between getDoc and a short timeout; on timeout resolve to null
+                        const adminDoc = await Promise.race([
+                            getDoc(adminDocRef),
+                            new Promise(resolve => setTimeout(() => resolve(null), 3000))
+                        ]) as any | null;
+
+                        if (adminDoc && typeof adminDoc.exists === 'function') {
+                            setIsAdmin(adminDoc.exists());
+                        } else {
+                            // timeout or no document => not admin (no noisy error)
+                            setIsAdmin(false);
+                        }
+                    } catch (error) {
+                        console.error("Error checking admin status:", error);
+                        setIsAdmin(false);
+                    } finally {
+                        setAdminLoading(false);
+                    }
+                })();
             } else {
                 setIsAdmin(false);
+                setAdminLoading(false);
             }
-            setLoading(false);
         });
 
         return unsubscribe;
@@ -50,7 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const value = {
         currentUser,
         loading,
-        isAdmin
+        isAdmin,
+        adminLoading
     };
 
     return (

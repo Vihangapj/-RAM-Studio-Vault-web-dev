@@ -18,6 +18,10 @@ export default {
       fontFamily: {
         'gunterz-black': ['Gunterz-Black', 'sans-serif'],
         'gunterz-bold-italic': ['Gunterz-BoldItalic', 'sans-serif'],
+        'gunterz': ['Gunterz-Regular', 'sans-serif'],
+        'gunterz-bold': ['Gunterz-Bold', 'sans-serif'],
+        'google-sans': ['"Google Sans"', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
       },
     },
   },

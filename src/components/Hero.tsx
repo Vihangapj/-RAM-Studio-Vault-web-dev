@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Content } from '../types/types';
-import { Play, Info, X } from 'lucide-react';
+import { Play, Video, X } from 'lucide-react';
+import { parseYoutubeId } from '../utils/youtube';
 
 interface HeroProps {
     featuredContent: Content | null;
@@ -12,10 +13,21 @@ const Hero: React.FC<HeroProps> = ({ featuredContent, onPlayClick }) => {
     const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
     React.useEffect(() => {
+        if (showTrailer) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showTrailer]);
+
+    React.useEffect(() => {
         if (featuredContent?.thumbnails && featuredContent.thumbnails.length > 0) {
             const timer = setInterval(() => {
                 setCurrentImageIndex((prev) => (prev + 1) % (featuredContent.thumbnails!.length + 1));
-            }, 3000);
+            }, 20000);
             return () => clearInterval(timer);
         }
     }, [featuredContent]);
@@ -31,46 +43,63 @@ const Hero: React.FC<HeroProps> = ({ featuredContent, onPlayClick }) => {
     }
 
     return (
-        <div className="relative w-full h-[60vh] md:h-[80vh]">
-            {/* Background Image */}
-            <div className="absolute inset-0 bg-black">
+        <div className="relative w-full h-[55vh] sm:h-[60vh] md:h-[80vh]">
+            {/* Background Image Layers */}
+            <div className="absolute inset-0 bg-black overflow-hidden">
+                {/* Blurred Background Layer for Mobile */}
                 <img
-                    key={displayImage}
+                    src={displayImage}
+                    className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-40 block md:hidden scale-110"
+                    alt=""
+                />
+
+                {/* Previous Image Layer */}
+                <img
+                    key={`prev-${currentImageIndex}`}
+                    src={[featuredContent.thumbnailUrl, ...(featuredContent.thumbnails || [])][(currentImageIndex - 1 + (featuredContent.thumbnails?.length || 0) + 1) % ((featuredContent.thumbnails?.length || 0) + 1)]}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-contain md:object-cover object-center opacity-0"
+                />
+                {/* Current Image Layer */}
+                <img
+                    key={`curr-${currentImageIndex}`}
                     src={displayImage}
                     alt={featuredContent.title}
-                    className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                    className="absolute inset-0 w-full h-full object-contain md:object-cover object-center animate-hero-fade"
                 />
             </div>
 
             {/* Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
 
             {/* Hero Content - Alignment Fixed Here */}
-            <div className="absolute bottom-[30%] left-0 w-full z-30">
+            <div className="absolute bottom-[10%] md:bottom-[25%] lg:bottom-[30%] left-0 w-full z-30">
                 <div className="max-w-[1800px] mx-auto px-4 md:px-8">
                     <div className="max-w-2xl">
-                        <h1 className="text-4xl md:text-6xl font-gunterz-black text-white mb-6 md:mb-8 drop-shadow-lg tracking-tighter">
-                            {featuredContent.title}
-                        </h1>
-                        <p className="text-zinc-200 text-sm md:text-lg mb-8 md:mb-10 line-clamp-3 drop-shadow-md font-medium max-w-lg">
+                        {(featuredContent.showTitleOnHero !== false) && (
+                            <h1 className="text-2xl md:text-6xl font-gunterz-bold text-white mb-3 md:mb-8 drop-shadow-lg tracking-tighter">
+                                {featuredContent.title}
+                            </h1>
+                        )}
+                        <p className="text-zinc-200 text-xs md:text-lg mb-6 md:mb-10 line-clamp-2 drop-shadow-md font-medium max-w-lg">
                             {featuredContent.description}
                         </p>
 
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => onPlayClick && featuredContent && onPlayClick(featuredContent)}
-                                className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-200 transition-colors"
+                                className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-200 transition-colors gs-btn"
                             >
                                 <Play className="w-5 h-5 fill-black" />
                                 Play
                             </button>
                             <button
                                 onClick={() => setShowTrailer(true)}
-                                className="flex items-center gap-2 bg-zinc-600/80 text-white px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-600 transition-colors backdrop-blur-sm"
+                                className="flex items-center gap-2 bg-zinc-800 text-white px-6 py-2 md:px-8 md:py-3 rounded font-gunterz-bold-italic hover:bg-zinc-700 transition-colors gs-btn"
                             >
-                                <Info className="w-5 h-5" />
-                                Watch Trailer
+                                <Video className="w-5 h-5" />
+                                Intro
                             </button>
                         </div>
                     </div>
@@ -89,8 +118,8 @@ const Hero: React.FC<HeroProps> = ({ featuredContent, onPlayClick }) => {
                         </button>
                         <iframe
                             className="w-full h-full"
-                            src={`https://www.youtube.com/embed/${featuredContent.youtubeId}?autoplay=1`}
-                            title="Trailer"
+                            src={`https://www.youtube.com/embed/${parseYoutubeId(featuredContent.youtubeId) || featuredContent.youtubeId}?autoplay=1`}
+                            title="Intro"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
                         />

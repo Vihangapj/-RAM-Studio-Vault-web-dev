@@ -1,0 +1,28 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.firebase.identities['email'] == request.auth.token.firebase.email;
+    }
+
+    // Thumbnails folder: Anyone can read, only admins can write
+    match /thumbnails/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Files folder: Anyone can read, only admins can write
+    match /files/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Deny all other access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

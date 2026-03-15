@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
-    const { currentUser, isAdmin, loading } = useAuth();
+    const { currentUser, isAdmin, loading, adminLoading } = useAuth();
 
     // Wait for auth state to be determined before redirecting
     if (loading) {
@@ -23,8 +23,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
         return <Navigate to="/login" replace />; // Redirect to login instead of home
     }
 
-    if (requireAdmin && !isAdmin) {
-        return <Navigate to="/" replace />;
+    if (requireAdmin) {
+        if (adminLoading) {
+            return (
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+            );
+        }
+
+        if (!isAdmin) {
+            return <Navigate to="/" replace />;
+        }
     }
 
     return <>{children}</>;

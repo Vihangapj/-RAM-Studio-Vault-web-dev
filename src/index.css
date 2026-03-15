@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +8,20 @@
   font-family: 'Gunterz-Black';
   src: url('./assets/fonts/Fontspring-DEMO-gunterz-bold.otf') format('opentype');
   font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gunterz-Regular';
+  src: url('./assets/fonts/FONTSPRING-DEMO-GUNTERZ-REGULAR.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gunterz-Bold';
+  src: url('./assets/fonts/FONTSPRING-DEMO-GUNTERZ-BOLD .OTF') format('opentype');
+  font-weight: bold;
   font-style: normal;
 }
 
@@ -54,5 +70,80 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .gs-btn {
+    font-family: 'Google Sans', Roboto, Arial, sans-serif;
+  }
+
+  /* Preloader animation */
+  .preloader-track {
+    position: relative;
+  }
+
+  .preloader-anim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.0) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.0) 100%);
+    transform: translateX(-120%);
+    animation: preloaderMove 1.2s linear infinite;
+  }
+
+  @keyframes preloaderMove {
+    0% {
+      transform: translateX(-120%);
+    }
+
+    100% {
+      transform: translateX(220%);
+    }
+  }
+
+  /* Gaming-style Coming Soon title */
+  .coming-soon-text {
+    font-family: 'Google Sans', 'Roboto', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @keyframes gamingPulse {
+    0% {
+      transform: translateY(0) scale(1);
+      filter: drop-shadow(0 0 0px rgba(255, 198, 0, 0));
+    }
+
+    40% {
+      transform: translateY(-6px) scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(255, 198, 0, 0.12));
+    }
+
+    80% {
+      transform: translateY(0) scale(1);
+      filter: drop-shadow(0 0 0px rgba(255, 198, 0, 0));
+    }
+
+    100% {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes heroFadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-hero-fade {
+    animation: heroFadeIn 2s ease-in-out forwards;
   }
 }

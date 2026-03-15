@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Lesson } from '../types/types';
-import { PlayCircle } from 'lucide-react';
 
 interface CoursePlaylistProps {
     lessons: Lesson[];
@@ -9,21 +8,10 @@ interface CoursePlaylistProps {
 }
 
 const CoursePlaylist: React.FC<CoursePlaylistProps> = ({ lessons, currentIndex, onSelect }) => {
-    const formatDuration = (seconds?: number) => {
-        if (seconds === undefined) return '—';
-        if (seconds >= 3600) {
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            return `${h}h ${m}m`;
-        }
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
-    };
     return (
         <div className="bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden">
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
-                <h3 className="text-lg font-bold text-white">Course Syllabus</h3>
+                <h3 className="text-lg font-google-sans font-normal text-white">Playlist</h3>
                 <p className="text-xs text-zinc-500">{lessons.length} Lessons</p>
             </div>
 
@@ -39,12 +27,8 @@ const CoursePlaylist: React.FC<CoursePlaylistProps> = ({ lessons, currentIndex, 
                                 : 'hover:bg-zinc-800/50 text-zinc-400 hover:text-white'
                                 }`}
                         >
-                            <div className={`mt-0.5 ${isActive ? 'text-white' : 'text-zinc-600'}`}>
-                                {isActive ? <PlayCircle className="w-5 h-5" /> : <div className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center text-[10px]">{idx + 1}</div>}
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-medium line-clamp-1">{lesson.title}</h4>
-                                <div className="text-xs text-zinc-500 mt-1">{lesson.durationSeconds ? formatDuration(lesson.durationSeconds) : '—'}</div>
+                            <div className="flex-1 min-w-0 py-1">
+                                <h4 className="text-sm font-google-sans font-normal line-clamp-1">{lesson.title}</h4>
                             </div>
                         </button>
                     );
